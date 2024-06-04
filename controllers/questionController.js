@@ -4,6 +4,14 @@ const User = require('../models/User')
 
 const createQuestion = async(req,res) => {
     try {
+        const user = req.user
+
+        if(!user){
+          res.status(404).json('no user found');
+        }
+
+        console.log(user)
+
         const { question, userId } = req.body;
 
         const aians = await generateAiAnswer(question)
@@ -51,3 +59,4 @@ module.exports = {
     createQuestion,
     getQuestionById
 }
+
