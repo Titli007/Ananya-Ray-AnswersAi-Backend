@@ -1,0 +1,6 @@
+/node_modules
+node_modules
+/wait-for-postgres.sh
+wait-for-postgres.sh
+.env
+/.env
