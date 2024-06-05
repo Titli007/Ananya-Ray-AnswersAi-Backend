@@ -2,46 +2,8 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-// const signIn = async (req,res) => {
-//     try{
-//         const {email,pass} = req.body
-//         if(email==='' && pass===''){
-//             res.status(400).send("insufficient data")
-//         }
-//         const existingUser = await User.findOne({ where : {email} });
-//         if(existingUser){
-//             res.status(400).send("user already exists")
-//         }
+const {blacklistedToken} = require('../middleware/verify')
 
-//         const encPass = await bcrypt.hash(pass,10)
-
-//         const newUser = await User.create({
-//             email,
-//             password: encPass
-//         });
-
-//         const token = jwt.sign(
-//             {
-//                 user_id : newUser._id,
-//                 email : newUser.email
-//             },
-//             'shhhh',
-//             {
-//                 expiresIn: '2h'
-//             }
-//         )
-
-//         newUser.pass = undefined
-
-//         res.status(200).send({success : 'true' , token: token, user: newUser})
-
-//     }
-//     catch(error){
-//         console.log(error)
-//         res.status(500).send('internal server error')
-//     }
-    
-// }
 
 
 const login = async (req, res) => {
@@ -82,6 +44,28 @@ const login = async (req, res) => {
   };
 
 
-module.exports = {
-    login
-}
+  const logout = (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).send("Authorization header missing");
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).send("Bearer token missing");
+        }
+
+        // Add the token to the blacklist
+        blacklistedToken.add(token);
+
+        res.status(200).send({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Internal server error');
+    }
+};
+
+  
+module.exports = { login, logout };;
+

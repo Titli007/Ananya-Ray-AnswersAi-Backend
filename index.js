@@ -6,7 +6,7 @@ const authRoutes = require('./routes/authRoutes')
 require('dotenv').config();
 
 const app = express();
-const port = 5000 || process.env.PORT;
+const port = process.env.PORT || 4000;
 app.use(express.json());
 
 
@@ -15,7 +15,7 @@ app.use('/api/questions', questionRoutes)
 app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello, from api!');
 });
 
 (async () => {

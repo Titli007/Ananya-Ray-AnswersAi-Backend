@@ -22,16 +22,13 @@ async function generateAiAnswer(userMsg) {
 
         try {
             const parsedResult = await parser.invoke(result);
-            // console.log(parsedResult);
             return parsedResult;
         } catch (parseError) {
-            // console.error("Error parsing the model result:", parseError);
-            throw parseError; // Re-throw the error after logging it
+            throw parseError; 
         }
         
     } catch (invokeError) {
-        // console.error("Error invoking the model:", invokeError);
-        throw invokeError; // Re-throw the error after logging it
+        throw invokeError; 
     }
 }
 

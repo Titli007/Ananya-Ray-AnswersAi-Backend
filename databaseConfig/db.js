@@ -1,7 +1,6 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config(); // Load environment variables from .env file
 
-// Use environment variables for sensitive information
 const database = process.env.DB_NAME || 'answers_ai';
 const username = process.env.DB_USER || 'postgres';
 const password = process.env.DB_PASSWORD || 'root';

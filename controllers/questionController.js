@@ -2,57 +2,75 @@ const Question = require('../models/Question')
 const { generateAiAnswer } = require('../utility/langchain')
 const User = require('../models/User')
 
-const createQuestion = async(req,res) => {
+
+const createQuestion = async (req, res) => {
+  try {
+    const user = req.user;
+
+    const existingUser = await User.findOne({
+      where: { id: user.user_id },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json('No user found');
+    }
+
+    const user_id = existingUser.id;
+    const { question } = req.body;
+
+    let aians;
     try {
-        const user = req.user
+      aians = await generateAiAnswer(question);
+    } catch (error) {
+      console.error('Error generating AI answer:', error);
+      return res.status(500).send('Error generating AI answer');
+    }
 
-        if(!user){
-          res.status(404).json('no user found');
-        }
+    console.log("Answer from controller:", aians);
 
-        console.log(user)
+    const newQuestion = await Question.create({
+      question: question,
+      answer: aians,
+      user_id: user_id
+    });
 
-        const { question, userId } = req.body;
+    res.status(201).json(newQuestion);
+  } catch (error) {
+    console.error('Error in createQuestion:', error);
+    res.status(500).send('Internal server error');
+  }
+};
 
-        const aians = await generateAiAnswer(question)
-
-        console.log("ans from controller", aians)
-    
-        // Create a new question with the placeholder answer
-        const newQuestion = await Question.create({
-          question : question,
-          answer: aians, // Placeholder answer
-          user_id: userId
-        });
-    
-        res.status(201).json(newQuestion);
-      } catch (error) {
-        console.log(error);
-        res.status(500).send('Internal server error');
-      }
-}
 
 const getQuestionById = async (req, res) => {
-    try {
-      const { questionId } = req.params;
-  
-      // Find the question by questionId
-      const question = await Question.findOne({
-        where: { id: questionId },
-        include: [{ model: User, attributes: ['id', 'email'] }] // Include the associated user
-      });
-  
-      if (!question) {
-        res.status(404).send("Question not found");
-        return;
-      }
-  
-      res.status(200).json(question);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Internal server error');
+  try {
+    const { questionId } = req.params;
+    const user = req.user;
+
+    const existingUser = await User.findOne({
+      where: { id: user.user_id },
+    });
+
+    if (!existingUser) {
+      return res.status(404).json('No user found');
     }
-  };
+
+    const question = await Question.findOne({
+      where: { id: questionId, user_id: existingUser.id },
+      include: [{ model: User, attributes: ['id', 'email'] }]
+    });
+
+    if (!question) {
+      return res.status(404).send("Question not found");
+    }
+
+    res.status(200).json(question);
+  } catch (error) {
+    console.error('Error in getQuestionById:', error);
+    res.status(500).send('Internal server error');
+  }
+};
+
 
 
 module.exports = {

@@ -24,7 +24,7 @@ const createUser = async (req,res) => {
 
         const token = jwt.sign(
             {
-                user_id : newUser._id,
+                user_id : newUser.id,
                 email : newUser.email
             },
             'shhhh',

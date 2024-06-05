@@ -27,4 +27,3 @@ EXPOSE 5000
 
 # Wait for PostgreSQL to be ready before starting the application
 CMD ["./wait-for-postgres.sh", "postgres", "yarn", "dev"]
-

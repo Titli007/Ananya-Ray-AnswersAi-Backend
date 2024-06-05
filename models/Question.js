@@ -1,4 +1,3 @@
-// models/Question.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../databaseConfig/db');
 const User = require('./User');
